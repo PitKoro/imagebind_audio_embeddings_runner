@@ -39,9 +39,9 @@ class PostgresClient:
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
 
-    def get_audio_public_links(self) -> List[Audio]:
+    def get_mp3_audio_by_uniq_public_links(self) -> List[Audio]:
         return [
-            el.public_link for el in self.session.\
-            query(Audio).filter(Audio.model_type == "App\Models\Audio").\
+            el for el in self.session.\
+            query(Audio).filter(Audio.model_type == "App\Models\Audio", Audio.public_link.endswith(".mp3")).\
             distinct(Audio.public_link).all()
         ]

@@ -1,3 +1,9 @@
+git+https://github.com/facebookresearch/ImageBind.git@c6a47d6dc2b53eced51d398c181d57049ca59286#egg=imagebind
+ipykernel
 sqlalchemy
 psycopg2
 pymilvus==2.4.0
+pydantic
+pydantic_settings
+pydub
+retry

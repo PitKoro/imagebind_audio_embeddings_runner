@@ -17,7 +17,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-class CustomMilvusClient(MilvusClient):
+class AudioImageBindMilvusClient(MilvusClient):
     def __init__(
         self,
         milvus_endpoint: str,
@@ -32,9 +32,10 @@ class CustomMilvusClient(MilvusClient):
         if self._get_connection().has_collection(collection_key):
             self.drop_collection(collection_key)
         fields = [
-            FieldSchema(name='id', dtype=DataType.INT64, descrition='Id', is_primary=True, auto_id=True),
+            # FieldSchema(name='id', dtype=DataType.INT64, descrition='Id', is_primary=True, auto_id=True),
+            FieldSchema(name='uuid', dtype=DataType.VARCHAR, max_length=2500, descrition='uuid', is_primary=True),
             FieldSchema(name='public_link', dtype=DataType.VARCHAR, max_length=2500, descrition='Public link'),
-            FieldSchema(name='embeddings', dtype=DataType.FLOAT_VECTOR, description='Embeddings of audio', dim=1024)
+            FieldSchema(name='embedding', dtype=DataType.FLOAT_VECTOR, description='Embeddings of audio', dim=1024)
         ]
         schema = CollectionSchema(fields=fields, description=f"Collection for audio embeddings from ImageBind model")
         self.create_collection(collection_key, schema=schema)
@@ -42,13 +43,13 @@ class CustomMilvusClient(MilvusClient):
         
 
     def insert_to_collection(self, collection_key: str, insert_data: List[Dict]) -> None:
-        primary_keys = self.insert(collection_name=collection_key, data=insert_data)
-        assert len(primary_keys) == len(insert_data), logger.error("Inserted less objects in collection that expected")
+        insert_result = self.insert(collection_name=collection_key, data=insert_data)
+        assert insert_result["insert_count"] == len(insert_data), logger.error("Inserted less objects in collection that expected")
         
     def create_collection_index(self, collection_key: str):
         index_params = self.prepare_index_params()
         index_params.add_index(
-            field_name="embeddings",
+            field_name="embedding",
             metric_type="COSINE",
             index_type="IVF_FLAT",
             index_name="vector_index",

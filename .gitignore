@@ -1,3 +1,5 @@
+*.checkpoints
+test_audios
 venv
 flagged
 .idea
